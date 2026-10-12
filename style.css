@@ -1,0 +1,699 @@
+/* =========================================
+   CHANSONS D'AMOUR
+   Des mélodies qui parlent au cœur.
+   ========================================= */
+
+:root {
+    color-scheme: light;
+
+    --background: #fff7fb;
+    --surface: #ffffff;
+    --surface-secondary: #f8eaf4;
+
+    --primary: #7b245f;
+    --primary-light: #a63c80;
+    --primary-dark: #4a174c;
+
+    --text: #30212e;
+    --text-secondary: #765e70;
+
+    --border: #ead5e4;
+    --favorite: #d32f73;
+
+    --shadow: 0 5px 20px rgba(74, 23, 76, 0.09);
+
+    --radius: 18px;
+}
+
+/* Réinitialisation */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100%;
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+
+    font-family:
+        system-ui,
+        -apple-system,
+        "Segoe UI",
+        sans-serif;
+
+    background: var(--background);
+    color: var(--text);
+
+    line-height: 1.6;
+
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Boutons et champs */
+
+button,
+input,
+select {
+    font: inherit;
+}
+
+button {
+    min-height: 44px;
+    padding: 10px 16px;
+
+    border: 1px solid transparent;
+    border-radius: 12px;
+
+    background: var(--surface-secondary);
+    color: var(--text);
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 3px solid var(--primary-light);
+    outline-offset: 3px;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+input,
+select {
+    width: 100%;
+    min-height: 48px;
+
+    padding: 12px 14px;
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    background: var(--surface);
+    color: var(--text);
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+/* Barre supérieure */
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding:
+        max(10px, env(safe-area-inset-top))
+        14px
+        10px;
+
+    background: var(--primary-dark);
+    color: #ffffff;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+}
+
+.topbar button {
+    flex-shrink: 0;
+
+    background: rgba(255, 255, 255, 0.13);
+    color: #ffffff;
+
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.brand-small {
+    flex: 1;
+
+    text-align: center;
+
+    font-size: 0.95rem;
+    font-weight: 800;
+}
+
+/* Contenu principal */
+
+main {
+    width: 100%;
+    max-width: 1000px;
+
+    margin: 0 auto;
+}
+
+.page {
+    display: none;
+
+    width: 100%;
+
+    padding: 20px 16px 32px;
+}
+
+.page.active {
+    display: block;
+
+    animation: page-appearance 0.2s ease;
+}
+
+@keyframes page-appearance {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Accueil */
+
+.hero {
+    padding: 28px 12px 24px;
+
+    text-align: center;
+}
+
+.logo {
+    display: block;
+
+    width: 150px;
+    height: 150px;
+
+    max-width: 55vw;
+    max-height: 55vw;
+
+    object-fit: contain;
+
+    margin: 0 auto 18px;
+}
+
+.hero h1 {
+    margin: 0;
+
+    color: var(--primary);
+
+    font-size: clamp(2rem, 7vw, 3rem);
+    line-height: 1.2;
+}
+
+.slogan {
+    margin: 14px 0;
+
+    color: var(--text-secondary);
+
+    font-size: 1.05rem;
+}
+
+#song-count {
+    display: inline-block;
+
+    margin-top: 8px;
+    padding: 6px 14px;
+
+    border-radius: 30px;
+
+    background: var(--surface-secondary);
+    color: var(--primary);
+
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+/* Boutons de l'accueil */
+
+.home-actions {
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 14px;
+
+    width: 100%;
+    max-width: 540px;
+
+    margin: 0 auto 24px;
+}
+
+.home-actions button {
+    width: 100%;
+    min-height: 56px;
+
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.primary {
+    background: var(--primary);
+    color: #ffffff;
+}
+
+.primary:hover {
+    background: var(--primary-light);
+}
+
+/* Titres des pages */
+
+.page h2 {
+    margin-top: 12px;
+    margin-bottom: 20px;
+
+    color: var(--primary);
+
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    line-height: 1.3;
+}
+
+.page h3 {
+    color: var(--primary);
+}
+
+/* Bibliothèque musicale */
+
+#search {
+    margin-top: 8px;
+    margin-bottom: 18px;
+}
+
+.song-list {
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 10px;
+}
+
+.song-row {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    min-width: 0;
+
+    padding: 8px;
+
+    border: 1px solid var(--border);
+    border-radius: 14px;
+
+    background: var(--surface);
+
+    box-shadow: 0 2px 8px rgba(74, 23, 76, 0.04);
+}
+
+.song-title {
+    flex: 1;
+    min-width: 0;
+
+    padding: 10px;
+
+    background: transparent;
+
+    text-align: left;
+    overflow-wrap: anywhere;
+
+    font-weight: 600;
+}
+
+.song-title:hover {
+    color: var(--primary-light);
+    background: var(--surface-secondary);
+}
+
+.favorite {
+    flex-shrink: 0;
+
+    width: 46px;
+    min-width: 46px;
+
+    padding: 6px;
+
+    background: transparent;
+
+    color: var(--favorite);
+
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+#empty-message {
+    padding: 18px;
+
+    border-radius: 12px;
+
+    background: var(--surface-secondary);
+
+    color: var(--text-secondary);
+
+    text-align: center;
+}
+
+/* Lecteur musical */
+
+#page-player {
+    text-align: center;
+}
+
+#player-back {
+    display: block;
+    margin-bottom: 22px;
+}
+
+.player-cover {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: min(60vw, 250px);
+    aspect-ratio: 1;
+
+    margin: 20px auto;
+
+    overflow: hidden;
+
+    border-radius: 24px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary-dark),
+            var(--primary-light)
+        );
+
+    box-shadow: var(--shadow);
+}
+
+.player-logo {
+    width: 78%;
+    height: 78%;
+
+    object-fit: contain;
+}
+
+#now-playing {
+    overflow-wrap: anywhere;
+}
+
+#audio-status {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+#audio-player {
+    display: block;
+
+    width: 100%;
+    max-width: 600px;
+
+    margin: 22px auto;
+}
+
+.player-actions {
+    display: flex;
+
+    gap: 10px;
+
+    margin: 20px 0;
+}
+
+.player-actions button {
+    flex: 1;
+    min-width: 0;
+
+    padding: 10px 8px;
+}
+
+/* Répétition */
+
+.repeat-section {
+    margin: 22px 0;
+
+    text-align: left;
+}
+
+.repeat-section select {
+    margin-top: 6px;
+}
+
+/* Paroles */
+
+.lyrics-section {
+    margin-top: 28px;
+    padding-top: 20px;
+
+    border-top: 1px solid var(--border);
+}
+
+#lyrics-toggle,
+#copy-lyrics {
+    width: 100%;
+    margin: 8px 0;
+}
+
+.lyrics {
+    margin-top: 16px;
+    padding: 20px 16px;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+
+    background: var(--surface);
+
+    text-align: left;
+}
+
+.lyrics h4 {
+    margin-top: 0;
+
+    color: var(--primary);
+
+    font-size: 1.15rem;
+}
+
+#lyrics-text {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+
+    line-height: 1.9;
+    font-size: 1rem;
+}
+
+/* Identité du créateur */
+
+#page-creator {
+    text-align: center;
+}
+
+#creator-back {
+    display: block;
+    margin-bottom: 20px;
+}
+
+.creator-card {
+    padding: 20px 16px;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+
+    background: var(--surface);
+
+    box-shadow: var(--shadow);
+}
+
+.creator-photo {
+    display: block;
+
+    width: min(65vw, 250px);
+    aspect-ratio: 1;
+
+    margin: 10px auto 24px;
+
+    border: 4px solid var(--surface-secondary);
+    border-radius: 50%;
+
+    object-fit: cover;
+}
+
+.creator-card h2 {
+    margin-bottom: 8px;
+}
+
+.creator-card h3 {
+    margin-top: 0;
+}
+
+.creator-card p {
+    line-height: 1.8;
+}
+
+/* Pied de page */
+
+footer {
+    padding: 22px 16px;
+
+    text-align: center;
+
+    color: var(--text-secondary);
+
+    font-size: 0.85rem;
+}
+
+footer p {
+    margin: 4px;
+}
+
+/* Thème sombre */
+
+body.dark {
+    color-scheme: dark;
+
+    --background: #19131b;
+    --surface: #281e2b;
+    --surface-secondary: #39283b;
+
+    --primary: #f0a1d2;
+    --primary-light: #ffb6df;
+    --primary-dark: #321532;
+
+    --text: #f8edf6;
+    --text-secondary: #d0b9cd;
+
+    --border: #513b51;
+    --favorite: #ff80ab;
+
+    --shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+}
+
+body.dark .topbar {
+    background: #251228;
+}
+
+body.dark .topbar button {
+    background: #49324c;
+    color: #ffffff;
+}
+
+body.dark .primary {
+    background: #913c79;
+    color: #ffffff;
+}
+
+body.dark .favorite {
+    color: var(--favorite);
+}
+
+body.dark .player-cover {
+    background:
+        linear-gradient(
+            135deg,
+            #321532,
+            #743b70
+        );
+}
+
+/* Ordinateurs et grandes tablettes */
+
+@media (min-width: 650px) {
+    .page {
+        padding: 28px 30px 40px;
+    }
+
+    .hero {
+        padding-top: 42px;
+    }
+
+    .logo {
+        width: 180px;
+        height: 180px;
+    }
+
+    .home-actions {
+        grid-template-columns: 1fr 1fr;
+        max-width: 680px;
+    }
+
+    .home-actions button:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .song-list {
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    .creator-card {
+        padding: 32px;
+    }
+
+    .lyrics {
+        padding: 28px;
+    }
+}
+
+/* Petits écrans */
+
+@media (max-width: 360px) {
+    .topbar {
+        gap: 5px;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .topbar button {
+        padding: 8px;
+        font-size: 0.85rem;
+    }
+
+    .brand-small {
+        font-size: 0.8rem;
+    }
+
+    .page {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .player-actions button {
+        font-size: 0.82rem;
+    }
+}
+
+/* Respecter les préférences de mouvement */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}

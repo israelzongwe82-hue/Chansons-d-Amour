@@ -1,0 +1,8 @@
+{
+  "appId": "com.israelzongwe.chansonsdamour",
+  "appName": "Chansons d’Amour",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

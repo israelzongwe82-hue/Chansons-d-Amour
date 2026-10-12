@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, viewport-fit=cover"
+    >
+
+    <meta name="theme-color" content="#4a174c">
+
+    <meta
+        name="description"
+        content="Chansons d’Amour : des mélodies qui parlent au cœur."
+    >
+
+    <title>Chansons d’Amour</title>
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="images/logo.png"
+    >
+</head>
+
+<body>
+
+    <!-- Barre supérieure -->
+    <header class="topbar">
+
+        <button
+            id="back-button"
+            type="button"
+            aria-label="Retour à la page précédente"
+        >
+            ← Retour
+        </button>
+
+        <div class="brand-small">
+            Chansons d’Amour
+        </div>
+
+        <button
+            id="theme-toggle"
+            type="button"
+            aria-label="Changer le thème"
+        >
+            🌙
+        </button>
+
+    </header>
+
+    <main>
+
+        <!-- PAGE D'ACCUEIL -->
+        <section id="page-home" class="page active">
+
+            <div class="hero">
+
+                <img
+                    src="images/logo.png"
+                    alt="Logo de Chansons d’Amour"
+                    class="logo"
+                >
+
+                <h1>Chansons d’Amour</h1>
+
+                <p class="slogan">
+                    Des mélodies qui parlent au cœur.
+                </p>
+
+                <p id="song-count">
+                    Notre bibliothèque musicale
+                </p>
+
+            </div>
+
+            <nav class="home-actions">
+
+                <button
+                    id="show-all"
+                    type="button"
+                    class="primary"
+                >
+                    🎵 Toutes les chansons
+                </button>
+
+                <button
+                    id="show-favorites"
+                    type="button"
+                >
+                    ❤️ Mes favoris
+                </button>
+
+                <button
+                    id="creator-button"
+                    type="button"
+                >
+                    👤 Identité du créateur
+                </button>
+
+            </nav>
+
+        </section>
+
+        <!-- PAGE DE LA BIBLIOTHÈQUE -->
+        <section id="page-songs" class="page">
+
+            <h2>Bibliothèque musicale</h2>
+
+            <label for="search">
+                Rechercher une chanson
+            </label>
+
+            <input
+                id="search"
+                type="search"
+                placeholder="Écris le titre d’une chanson..."
+                autocomplete="off"
+            >
+
+            <div id="song-list" class="song-list"></div>
+
+            <p id="empty-message" hidden>
+                Aucune chanson ne correspond à cette recherche.
+            </p>
+
+        </section>
+
+        <!-- PAGE DU LECTEUR -->
+        <section id="page-player" class="page">
+
+            <button
+                id="player-back"
+                type="button"
+            >
+                ← Retour à la liste
+            </button>
+
+            <div class="player-cover">
+
+                <img
+                    src="images/logo.png"
+                    alt=""
+                    class="player-logo"
+                >
+
+            </div>
+
+            <h2 id="now-playing">
+                Choisis une chanson
+            </h2>
+
+            <p id="audio-status" role="status">
+                Sélectionne une chanson dans la bibliothèque.
+            </p>
+
+            <audio
+                id="audio-player"
+                controls
+                preload="metadata"
+            >
+                Votre navigateur ne prend pas en charge la lecture audio.
+            </audio>
+
+            <div class="player-actions">
+
+                <button
+                    id="previous"
+                    type="button"
+                >
+                    ⏮ Précédente
+                </button>
+
+                <button
+                    id="next"
+                    type="button"
+                >
+                    Suivante ⏭
+                </button>
+
+            </div>
+
+            <div class="repeat-section">
+
+                <label for="repeat-mode">
+                    Mode de répétition
+                </label>
+
+                <select id="repeat-mode">
+
+                    <option value="none">
+                        Aucune répétition
+                    </option>
+
+                    <option value="one">
+                        Répéter la chanson actuelle
+                    </option>
+
+                    <option value="all">
+                        Répéter toute la liste
+                    </option>
+
+                </select>
+
+            </div>
+
+            <section class="lyrics-section">
+
+                <h3>Paroles de la chanson</h3>
+
+                <button
+                    id="lyrics-toggle"
+                    type="button"
+                >
+                    📝 Afficher les paroles
+                </button>
+
+                <div id="lyrics-box" class="lyrics" hidden>
+
+                    <h4 id="lyrics-title">
+                        Paroles
+                    </h4>
+
+                    <p id="lyrics-text"></p>
+
+                    <button
+                        id="copy-lyrics"
+                        type="button"
+                    >
+                        📋 Copier les paroles
+                    </button>
+
+                </div>
+
+            </section>
+
+        </section>
+
+        <!-- PAGE IDENTITÉ DU CRÉATEUR -->
+        <section id="page-creator" class="page">
+
+            <button
+                id="creator-back"
+                type="button"
+            >
+                ← Retour
+            </button>
+
+            <div class="creator-card">
+
+                <img
+                    src="images/createur.png"
+                    alt="Photo du créateur"
+                    class="creator-photo"
+                >
+
+                <h2>Identité du créateur</h2>
+
+                <h3>KIBWE ZONGWE Israël</h3>
+
+                <p>
+                    Bienvenue dans Chansons d’Amour,
+                    une application dédiée aux mélodies
+                    qui expriment les sentiments et les émotions.
+                </p>
+
+                <p>
+                    La biographie complète du créateur
+                    sera ajoutée dans une prochaine étape.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Pied de page -->
+    <footer>
+
+        <p>
+            Chansons d’Amour
+        </p>
+
+        <p>
+            Des mélodies qui parlent au cœur.
+        </p>
+
+    </footer>
+
+    <!-- Le code JavaScript sera chargé séparément -->
+    <script src="app.js"></script>
+
+</body>
+</html>
