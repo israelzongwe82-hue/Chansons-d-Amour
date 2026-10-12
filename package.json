@@ -7,7 +7,7 @@
   "main": "electron-main.js",
   "scripts": {
     "start": "electron .",
-    "build:windows": "electron-builder --win nsis",
+    "build:windows": "electron-builder --win nsis --publish never",
     "prepare:android": "npx cap sync android"
   },
   "dependencies": {
@@ -43,6 +43,7 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
-    }
+    },
+    "publish": null
   }
 }
