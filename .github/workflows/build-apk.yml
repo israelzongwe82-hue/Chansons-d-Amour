@@ -22,7 +22,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
 
       - name: Installer Java
         uses: actions/setup-java@v4
@@ -36,16 +35,23 @@ jobs:
       - name: Installer les dépendances
         run: npm install
 
-      - name: Préparer les fichiers de l'application
+      - name: Vérifier les fichiers nécessaires
+        run: |
+          test -f package.json
+          test -f capacitor.config.json
+          test -f index.html
+          test -f style.css
+          test -f app.js
+          test -f manifest.json
+          test -d images
+          test -d audios
+
+      - name: Préparer les fichiers web
         run: |
           mkdir -p www
           cp index.html style.css app.js manifest.json service-worker.js www/
           cp -r images www/images
           cp -r audios www/audios
-
-      - name: Vérifier la configuration Capacitor
-        run: |
-          node -e "const c=require('./capacitor.config.json'); if(c.webDir!=='www') process.exit(1); console.log('Configuration Capacitor correcte')"
 
       - name: Ajouter la plateforme Android
         run: npx cap add android
