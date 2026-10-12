@@ -32,10 +32,10 @@ jobs:
       - name: Installer Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Installer les dépendances
+      - name: Installer les dépendances du projet
         run: npm install
 
-      - name: Vérifier les fichiers nécessaires
+      - name: Vérifier les fichiers du projet
         run: |
           test -f package.json
           test -f capacitor.config.json
@@ -43,6 +43,7 @@ jobs:
           test -f style.css
           test -f app.js
           test -f manifest.json
+          test -f service-worker.js
           test -d images
           test -d audios
 
@@ -53,7 +54,7 @@ jobs:
           cp -r images www/images
           cp -r audios www/audios
 
-      - name: Ajouter la plateforme Android
+      - name: Ajouter Android
         run: npx cap add android
 
       - name: Synchroniser Android
