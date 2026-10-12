@@ -1,0 +1,63 @@
+name: Construire l'application Windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    name: Créer l'installateur Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Vérifier les fichiers nécessaires
+        shell: pwsh
+        run: |
+          $requiredFiles = @(
+            "package.json",
+            "index.html",
+            "style.css",
+            "app.js",
+            "manifest.json",
+            "electron-main.js"
+          )
+
+          foreach ($file in $requiredFiles) {
+            if (-not (Test-Path $file)) {
+              throw "Fichier manquant : $file"
+            }
+          }
+
+          if (-not (Test-Path "images")) {
+            throw "Le dossier images est absent."
+          }
+
+          if (-not (Test-Path "audios")) {
+            throw "Le dossier audios est absent."
+          }
+
+      - name: Installer les dépendances
+        run: npm install
+
+      - name: Construire l'application Windows
+        run: npm run build:windows
+
+      - name: Publier l'installateur Windows
+        uses: actions/upload-artifact@v4
+        with:
+          name: Chansons-d-Amour-Windows
+          path: dist/*.exe
+          if-no-files-found: error
