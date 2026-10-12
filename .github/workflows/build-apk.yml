@@ -14,6 +14,10 @@ jobs:
     name: Construire l'APK Android
     runs-on: ubuntu-latest
 
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
     steps:
       - name: Récupérer le dépôt
         uses: actions/checkout@v4
@@ -29,22 +33,22 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Installer Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Configurer Android SDK
+        run: |
+          echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
 
       - name: Accepter les licences Android
-        run: yes | sdkmanager --licenses || true
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses || true
 
       - name: Installer les composants Android
         run: |
-          sdkmanager "platform-tools"
-          sdkmanager "platforms;android-36"
-          sdkmanager "build-tools;36.0.0"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
-      - name: Installer les dépendances du projet
+      - name: Installer les dépendances Node.js
         run: npm install
 
-      - name: Vérifier les fichiers nécessaires
+      - name: Vérifier les fichiers du projet
         run: |
           test -f package.json
           test -f capacitor.config.json
@@ -63,7 +67,7 @@ jobs:
           cp -r images www/images
           cp -r audios www/audios
 
-      - name: Ajouter Android
+      - name: Ajouter la plateforme Android
         run: npx cap add android
 
       - name: Synchroniser Android
