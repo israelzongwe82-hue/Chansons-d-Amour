@@ -1,0 +1,48 @@
+{
+  "name": "chansons-d-amour",
+  "version": "1.0.0",
+  "description": "Chansons d’Amour - Des mélodies qui parlent au cœur.",
+  "private": true,
+  "author": "KIBWE ZONGWE Israël",
+  "main": "electron-main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:windows": "electron-builder --win nsis",
+    "prepare:android": "npx cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/core": "^7.4.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.3",
+    "electron": "^37.2.6",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.israelzongwe.chansonsdamour",
+    "productName": "Chansons d'Amour",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "style.css",
+      "app.js",
+      "manifest.json",
+      "service-worker.js",
+      "electron-main.js",
+      "images/**/*",
+      "audios/**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
