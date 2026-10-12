@@ -32,10 +32,19 @@ jobs:
       - name: Installer Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Accepter les licences Android
+        run: yes | sdkmanager --licenses || true
+
+      - name: Installer les composants Android
+        run: |
+          sdkmanager "platform-tools"
+          sdkmanager "platforms;android-36"
+          sdkmanager "build-tools;36.0.0"
+
       - name: Installer les dépendances du projet
         run: npm install
 
-      - name: Vérifier les fichiers du projet
+      - name: Vérifier les fichiers nécessaires
         run: |
           test -f package.json
           test -f capacitor.config.json
