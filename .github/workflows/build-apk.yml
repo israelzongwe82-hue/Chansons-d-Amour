@@ -43,12 +43,15 @@ jobs:
 
       - name: Installer les composants Android
         run: |
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            "platform-tools" \
+            "platforms;android-36" \
+            "build-tools;36.0.0"
 
-      - name: Installer les dépendances Node.js
+      - name: Installer les dépendances
         run: npm install
 
-      - name: Vérifier les fichiers du projet
+      - name: Vérifier les fichiers
         run: |
           test -f package.json
           test -f capacitor.config.json
@@ -67,8 +70,11 @@ jobs:
           cp -r images www/images
           cp -r audios www/audios
 
-      - name: Ajouter la plateforme Android
-        run: npx cap add android
+      - name: Ajouter Android si nécessaire
+        run: |
+          if [ ! -d android ]; then
+            npx cap add android
+          fi
 
       - name: Synchroniser Android
         run: npx cap sync android
