@@ -97,6 +97,13 @@ function getAudioPath(song) {
   return "audios/" + encodeURI(song.audio);
 }
 
+
+window.addEventListener("popstate", () => {
+  if (navigationHistory.length > 0) {
+    const previous = navigationHistory.pop();
+    showPage(previous, false);
+  } else if (currentPage !== "page-home") {
+    showPage("page-home", false);
 /* -------------------- NAVIGATION -------------------- */
 
 function showPage(pageId, addToHistory = true) {
@@ -110,6 +117,9 @@ function showPage(pageId, addToHistory = true) {
   if (addToHistory && currentPage !== pageId) {
     navigationHistory.push(currentPage);
     previousPage = currentPage;
+
+    // Permet au bouton Retour Android de revenir à la page précédente.
+    history.pushState({ page: pageId }, "", "#" + pageId);
   }
 
   document.querySelectorAll(".page").forEach((page) => {
@@ -138,8 +148,7 @@ function goHome() {
 
 function goBack() {
   if (navigationHistory.length > 0) {
-    const previous = navigationHistory.pop();
-    showPage(previous, false);
+    history.back();
     return;
   }
 
@@ -165,7 +174,7 @@ $("#player-back")?.addEventListener("click", goBack);
 
 $("#creator-back")?.addEventListener("click", goBack);
 
-/* Bouton Retour du navigateur */
+/* Retour navigateur et navigation Android */
 
 window.addEventListener("popstate", () => {
   if (navigationHistory.length > 0) {
@@ -175,7 +184,6 @@ window.addEventListener("popstate", () => {
     showPage("page-home", false);
   }
 });
-
 /* -------------------- PAGE D'ACCUEIL -------------------- */
 
 $("#show-all")?.addEventListener("click", () => {
