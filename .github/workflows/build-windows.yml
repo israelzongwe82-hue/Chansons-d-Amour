@@ -22,6 +22,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
       - name: Vérifier les fichiers nécessaires
         shell: pwsh
@@ -36,24 +37,37 @@ jobs:
           )
 
           foreach ($file in $requiredFiles) {
-            if (-not (Test-Path $file)) {
+            if (-not (Test-Path -LiteralPath $file -PathType Leaf)) {
               throw "Fichier manquant : $file"
             }
           }
 
-          if (-not (Test-Path "images")) {
-            throw "Le dossier images est absent."
-          }
-
-          if (-not (Test-Path "audios")) {
-            throw "Le dossier audios est absent."
+          foreach ($directory in @("images", "audios")) {
+            if (-not (Test-Path -LiteralPath $directory -PathType Container)) {
+              throw "Le dossier $directory est absent."
+            }
           }
 
       - name: Installer les dépendances
-        run: npm install
+        shell: pwsh
+        run: npm ci
 
       - name: Construire l'application Windows
+        shell: pwsh
         run: npm run build:windows
+
+      - name: Vérifier l'installateur Windows
+        shell: pwsh
+        run: |
+          $installers = Get-ChildItem -Path "dist" -Filter "*.exe" -File -ErrorAction SilentlyContinue
+
+          if (-not $installers) {
+            throw "Aucun installateur Windows (.exe) n'a été généré dans le dossier dist."
+          }
+
+          $installers | ForEach-Object {
+            Write-Host "Installateur généré : $($_.FullName)"
+          }
 
       - name: Publier l'installateur Windows
         uses: actions/upload-artifact@v4
