@@ -24,7 +24,7 @@ const SONGS = [
   { title: "Mon Plus Beau Rêve", audio: "Mon Plus Beau Rêve.mp3", lyrics: "" },
   { title: "Mon éternit", audio: "Mon éternit.mp3", lyrics: "" },
   { title: "Même dans mes rêves", audio: "Même dans mes rêves.mp3", lyrics: "" },
-  { title: "Même si tu pars", audio: "Même si tu pars.mp3", lyrics: "" },
+  { title: "Même si tu pars", audio: "Même si tu pars", lyrics: "" },
   { title: "Plus que les mots", audio: "Plus que les mots.mp3", lyrics: "" },
   { title: "Quand nous serons ensemble", audio: "Quand nous serons ensemble.mp3", lyrics: "" },
   { title: "Reine de mon coeur", audio: "Reine de mon coeur.mp3", lyrics: "" },
@@ -93,13 +93,6 @@ const backButton = $("#back-button");
 
 /* -------------------- CHEMIN DES CHANSONS -------------------- */
 
-/*
-   IMPORTANT :
-   Les fichiers audio doivent être placés dans le dossier audios/.
-   Le nom de chaque fichier doit correspondre exactement au nom
-   indiqué dans la liste SONGS.
-*/
-
 function getAudioPath(song) {
   return "audios/" + encodeURI(song.audio);
 }
@@ -160,10 +153,6 @@ function goBack() {
   );
 
   if (shouldLeave) {
-    /*
-      Dans un navigateur, JavaScript ne peut pas fermer toutes les
-      fenêtres librement. Le bouton Retour du navigateur reste utilisable.
-    */
     history.back();
   }
 }
@@ -173,6 +162,8 @@ function goBack() {
 backButton?.addEventListener("click", goBack);
 
 $("#player-back")?.addEventListener("click", goBack);
+
+$("#creator-back")?.addEventListener("click", goBack);
 
 /* Bouton Retour du navigateur */
 
@@ -303,10 +294,6 @@ function toggleFavorite(song) {
 
   saveValue("chansonsAmourFavorites", favorites);
 
-  /*
-    Actualiser la liste si elle est ouverte, afin de refléter
-    immédiatement les changements dans les favoris.
-  */
   if (currentPage === "page-songs") {
     if (
       currentLibrary.every((item) =>
@@ -345,6 +332,582 @@ function playSong(index) {
   const song = SONGS[currentSongIndex];
 
   isChangingSong = true;
+
+  audioPlayer.pause();
+  audioPlayer.src = getAudioPath(song);
+  audioPlayer.loop = repeatMode === "one";
+  audioPlayer.load();
+
+  if (nowPlaying) {
+    nowPlaying.textContent = song.title;
+  }
+
+  if (audioStatus) {
+    audioStatus.textContent = "Chargement de la chanson…";
+  }
+
+  updateLyrics(song);
+  updateCurrentRepeatControl();
+
+  showPage("page-player");
+
+  const playPromise = audioPlayer.play();
+
+  if (playPromise && typeof playPromise.then === "function") {
+    playPromise
+      .then(() => {
+        if (audioStatus) {
+          audioStatus.textContent = "Lecture en cours";
+        }
+      })
+      .catch((error) => {
+        console.warn("Lecture impossible :", error);
+
+        if (audioStatus) {
+          audioStatus.textContent =
+            "Impossible de lire cette chanson. Vérifiez le fichier audio.";
+        }
+      })
+      .finally(() => {
+        isChangingSong = false;
+      });
+  } else {
+    isChangingSong = false;
+  }
+}
+
+function playNextSong() {
+  if (SONGS.length === 0) {
+    return;
+  }
+
+  const nextIndex = (currentSongIndex + 1) % SONGS.length;
+  playSong(nextIndex);
+}
+
+function playPreviousSong() {
+  if (SONGS.length === 0) {
+    return;
+  }
+
+  const previousIndex =
+    (currentSongIndex - 1 + SONGS.length) % SONGS.length;
+
+  playSong(previousIndex);
+}
+
+$("#next")?.addEventListener("click", playNextSong);
+
+$("#previous")?.addEventListener("click", playPreviousSong);
+
+audioPlayer?.addEventListener("play", () => {
+  if (audioStatus) {
+    audioStatus.textContent = "Lecture en cours";
+  }
+});
+
+audioPlayer?.addEventListener("pause", () => {
+  if (
+    audioStatus &&
+    !audioPlayer.ended &&
+    audioPlayer.currentSrc
+  ) {
+    audioStatus.textContent = "Lecture en pause";
+  }
+});
+
+audioPlayer?.addEventListener("waiting", () => {
+  if (audioStatus) {
+    audioStatus.textContent = "Chargement…";
+  }
+});
+
+audioPlayer?.addEventListener("error", () => {
+  if (isChangingSong) {
+    return;
+  }
+
+  if (audioStatus) {
+    audioStatus.textContent =
+      "Fichier audio introuvable ou impossible à lire.";
+  }
+});
+
+/* -------------------- MODES DE RÉPÉTITION -------------------- */
+
+const repeatLabels = {
+  none: "Répétition : aucune",
+  one: "Répétition : chanson actuelle",
+  all: "Répétition : toute la liste"
+};
+
+function updateCurrentRepeatControl() {
+  if (repeatButton) {
+    repeatButton.value = repeatMode;
+    repeatButton.setAttribute(
+      "aria-label",
+      repeatLabels[repeatMode]
+    );
+    repeatButton.title = repeatLabels[repeatMode];
+  }
+
+  if (audioPlayer) {
+    audioPlayer.loop = repeatMode === "one";
+  }
+}
+
+function setRepeatMode(mode) {
+  if (!["none", "one", "all"].includes(mode)) {
+    return;
+  }
+
+  repeatMode = mode;
+  updateCurrentRepeatControl();
+}
+
+repeatButton?.addEventListener("change", () => {
+  setRepeatMode(repeatButton.value);
+});
+
+audioPlayer?.addEventListener("ended", () => {
+  if (repeatMode === "one") {
+    return;
+  }
+
+  if (repeatMode === "all") {
+    playNextSong();
+    return;
+  }
+
+  if (currentSongIndex < SONGS.length - 1) {
+    playSong(currentSongIndex + 1);
+  } else if (audioStatus) {
+    audioStatus.textContent = "Fin de la liste de chansons.";
+  }
+});
+
+/* -------------------- PAROLES DES CHANSONS -------------------- */
+
+function updateLyrics(song) {
+  if (lyricsTitle) {
+    lyricsTitle.textContent = "Paroles — " + song.title;
+  }
+
+  if (lyricsText) {
+    lyricsText.textContent = song.lyrics.trim()
+      ? song.lyrics
+      : "Les paroles de cette chanson n’ont pas encore été ajoutées.";
+  }
+
+  if (lyricsBox) {
+    lyricsBox.hidden = !lyricsVisible;
+  }
+
+  const toggleButton = $("#lyrics-toggle");
+
+  if (toggleButton) {
+    toggleButton.textContent = lyricsVisible
+      ? "Masquer les paroles"
+      : "Afficher les paroles";
+  }
+}
+
+$("#lyrics-toggle")?.addEventListener("click", () => {
+  lyricsVisible = !lyricsVisible;
+
+  const song = SONGS[currentSongIndex];
+
+  if (song) {
+    updateLyrics(song);
+  }
+});
+
+$("#copy-lyrics")?.addEventListener("click", async () => {
+  const song = SONGS[currentSongIndex];
+
+  if (!song || !song.lyrics.trim()) {
+    window.alert("Les paroles de cette chanson ne sont pas encore disponibles.");
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(song.lyrics);
+    window.alert("Les paroles ont été copiées.");
+  } catch (error) {
+    console.warn("Copie impossible :", error);
+    window.alert("La copie automatique n'est pas disponible sur cette page.");
+  }
+});
+
+/* -------------------- THÈME CLAIR / SOMBRE -------------------- */
+
+function applyTheme(theme) {
+  const darkMode = theme === "dark";
+
+  document.body.classList.toggle("dark", darkMode);
+
+  if (themeButton) {
+    themeButton.textContent = darkMode ? "☀️" : "🌙";
+    themeButton.setAttribute(
+      "aria-label",
+      darkMode ? "Activer le thème clair" : "Activer le thème sombre"
+    );
+  }
+}
+
+let savedTheme = "light";
+
+try {
+  savedTheme = localStorage.getItem("chansonsAmourTheme") || "light";
+} catch (error) {
+  console.warn("Impossible de lire le thème enregistré :", error);
+}
+
+applyTheme(savedTheme);
+
+themeButton?.addEventListener("click", () => {
+  const nextTheme = document.body.classList.contains("dark")
+    ? "light"
+    : "dark";
+
+  applyTheme(nextTheme);
+
+  try {
+    localStorage.setItem("chansonsAmourTheme", nextTheme);
+  } catch (error) {
+    console.warn("Impossible d'enregistrer le thème :", error);
+  }
+});
+
+/* -------------------- INFORMATIONS DU CRÉATEUR -------------------- */
+
+const creatorPhoto = document.querySelector(".creator-photo");
+
+if (creatorPhoto) {
+  creatorPhoto.alt = "Photo du créateur de Chansons d’Amour";
+}
+
+/*
+  La page du créateur utilise la photo images/createur.png.
+  La biographie détaillée pourra être ajoutée dans index.html.
+*/
+
+/* -------------------- INITIALISATION -------------------- */
+
+function initializeApp() {
+  renderSongList(SONGS);
+  updateCurrentRepeatControl();
+
+  if (audioPlayer) {
+    audioPlayer.loop = false;
+  }
+
+  showPage("page-home", false);
+
+  console.log("Chansons d’Amour est prête.");
+  console.log("Nombre de chansons :", SONGS.length);
+}
+
+document.addEventListener("DOMContentLoaded", initializeApp);
+
+/* -------------------- SERVICE WORKER -------------------- */
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("./service-worker.js")
+      .then((registration) => {
+        console.log(
+          "Service worker enregistré :",
+          registration.scope
+        );
+      })
+      .catch((error) => {
+        console.error(
+          "Erreur lors de l'enregistrement du service worker :",
+          error
+        );
+      });
+  });
+});
+
+  if (playPromise && typeof playPromise.then === "function") {
+    playPromise
+      .then(() => {
+        if (audioStatus) {
+          audioStatus.textContent = "Lecture en cours";
+        }
+      })
+      .catch((error) => {
+        console.warn("Lecture impossible :", error);
+
+        if (audioStatus) {
+          audioStatus.textContent =
+            "Impossible de lire cette chanson. Vérifiez le fichier audio.";
+        }
+      })
+      .finally(() => {
+        isChangingSong = false;
+      });
+  } else {
+    isChangingSong = false;
+  }
+}
+
+function playNextSong() {
+  if (SONGS.length === 0) {
+    return;
+  }
+
+  const nextIndex = (currentSongIndex + 1) % SONGS.length;
+  playSong(nextIndex);
+}
+
+function playPreviousSong() {
+  if (SONGS.length === 0) {
+    return;
+  }
+
+  const previousIndex =
+    (currentSongIndex - 1 + SONGS.length) % SONGS.length;
+
+  playSong(previousIndex);
+}
+
+$("#next")?.addEventListener("click", playNextSong);
+
+$("#previous")?.addEventListener("click", playPreviousSong);
+
+audioPlayer?.addEventListener("play", () => {
+  if (audioStatus) {
+    audioStatus.textContent = "Lecture en cours";
+  }
+});
+
+audioPlayer?.addEventListener("pause", () => {
+  if (
+    audioStatus &&
+    !audioPlayer.ended &&
+    audioPlayer.currentSrc
+  ) {
+    audioStatus.textContent = "Lecture en pause";
+  }
+});
+
+audioPlayer?.addEventListener("waiting", () => {
+  if (audioStatus) {
+    audioStatus.textContent = "Chargement…";
+  }
+});
+
+audioPlayer?.addEventListener("error", () => {
+  if (isChangingSong) {
+    return;
+  }
+
+  if (audioStatus) {
+    audioStatus.textContent =
+      "Fichier audio introuvable ou impossible à lire.";
+  }
+});
+
+/* -------------------- MODES DE RÉPÉTITION -------------------- */
+
+const repeatLabels = {
+  none: "Répétition : aucune",
+  one: "Répétition : chanson actuelle",
+  all: "Répétition : toute la liste"
+};
+
+function updateCurrentRepeatControl() {
+  if (repeatButton) {
+    repeatButton.value = repeatMode;
+    repeatButton.setAttribute(
+      "aria-label",
+      repeatLabels[repeatMode]
+    );
+    repeatButton.title = repeatLabels[repeatMode];
+  }
+
+  if (audioPlayer) {
+    audioPlayer.loop = repeatMode === "one";
+  }
+}
+
+function setRepeatMode(mode) {
+  if (!["none", "one", "all"].includes(mode)) {
+    return;
+  }
+
+  repeatMode = mode;
+  updateCurrentRepeatControl();
+}
+
+repeatButton?.addEventListener("change", () => {
+  setRepeatMode(repeatButton.value);
+});
+
+audioPlayer?.addEventListener("ended", () => {
+  if (repeatMode === "one") {
+    return;
+  }
+
+  if (repeatMode === "all") {
+    playNextSong();
+    return;
+  }
+
+  if (currentSongIndex < SONGS.length - 1) {
+    playSong(currentSongIndex + 1);
+  } else if (audioStatus) {
+    audioStatus.textContent = "Fin de la liste de chansons.";
+  }
+});
+
+/* -------------------- PAROLES DES CHANSONS -------------------- */
+
+function updateLyrics(song) {
+  if (lyricsTitle) {
+    lyricsTitle.textContent = "Paroles — " + song.title;
+  }
+
+  if (lyricsText) {
+    lyricsText.textContent = song.lyrics.trim()
+      ? song.lyrics
+      : "Les paroles de cette chanson n’ont pas encore été ajoutées.";
+  }
+
+  if (lyricsBox) {
+    lyricsBox.hidden = !lyricsVisible;
+  }
+
+  const toggleButton = $("#lyrics-toggle");
+
+  if (toggleButton) {
+    toggleButton.textContent = lyricsVisible
+      ? "Masquer les paroles"
+      : "Afficher les paroles";
+  }
+}
+
+$("#lyrics-toggle")?.addEventListener("click", () => {
+  lyricsVisible = !lyricsVisible;
+
+  const song = SONGS[currentSongIndex];
+
+  if (song) {
+    updateLyrics(song);
+  }
+});
+
+$("#copy-lyrics")?.addEventListener("click", async () => {
+  const song = SONGS[currentSongIndex];
+
+  if (!song || !song.lyrics.trim()) {
+    window.alert("Les paroles de cette chanson ne sont pas encore disponibles.");
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(song.lyrics);
+    window.alert("Les paroles ont été copiées.");
+  } catch (error) {
+    console.warn("Copie impossible :", error);
+    window.alert("La copie automatique n'est pas disponible sur cette page.");
+  }
+});
+
+/* -------------------- THÈME CLAIR / SOMBRE -------------------- */
+
+function applyTheme(theme) {
+  const darkMode = theme === "dark";
+
+  document.body.classList.toggle("dark", darkMode);
+
+  if (themeButton) {
+    themeButton.textContent = darkMode ? "☀️" : "🌙";
+    themeButton.setAttribute(
+      "aria-label",
+      darkMode ? "Activer le thème clair" : "Activer le thème sombre"
+    );
+  }
+}
+
+let savedTheme = "light";
+
+try {
+  savedTheme = localStorage.getItem("chansonsAmourTheme") || "light";
+} catch (error) {
+  console.warn("Impossible de lire le thème enregistré :", error);
+}
+
+applyTheme(savedTheme);
+
+themeButton?.addEventListener("click", () => {
+  const nextTheme = document.body.classList.contains("dark")
+    ? "light"
+    : "dark";
+
+  applyTheme(nextTheme);
+
+  try {
+    localStorage.setItem("chansonsAmourTheme", nextTheme);
+  } catch (error) {
+    console.warn("Impossible d'enregistrer le thème :", error);
+  }
+});
+
+/* -------------------- INFORMATIONS DU CRÉATEUR -------------------- */
+
+const creatorPhoto = document.querySelector(".creator-photo");
+
+if (creatorPhoto) {
+  creatorPhoto.alt = "Photo du créateur de Chansons d’Amour";
+}
+
+/*
+  La page du créateur utilise la photo images/createur.png.
+  La biographie détaillée pourra être ajoutée dans index.html.
+*/
+
+/* -------------------- INITIALISATION -------------------- */
+
+function initializeApp() {
+  renderSongList(SONGS);
+  updateCurrentRepeatControl();
+
+  if (audioPlayer) {
+    audioPlayer.loop = false;
+  }
+
+  showPage("page-home", false);
+
+  console.log("Chansons d’Amour est prête.");
+  console.log("Nombre de chansons :", SONGS.length);
+}
+
+document.addEventListener("DOMContentLoaded", initializeApp);
+
+/* -------------------- SERVICE WORKER -------------------- */
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("./service-worker.js")
+      .then((registration) => {
+        console.log(
+          "Service worker enregistré :",
+          registration.scope
+        );
+      })
+      .catch((error) => {
+        console.error(
+          "Erreur lors de l'enregistrement du service worker :",
+          error
+        );
+      });
+  });
+                         }g = true;
 
   audioPlayer.pause();
   audioPlayer.src = getAudioPath(song);
